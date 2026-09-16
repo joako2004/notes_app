@@ -1,8 +1,8 @@
-# Plan de acción — App de Notas + To-Do + Hábitos
+# Plan de acción — App de Notas + To-Do + Hábitos + Entrenamiento
 
 > Plan operativo para ejecutar con opencode, dividido en subtareas por fase.
 > Convención: **[OPENCODE]** = lo ejecuta el agente. **[PROGRAMADOR]** = lo hacés vos (configuración, servicios externos, credenciales, pruebas en dispositivo real, decisiones de negocio/diseño).
-> Última actualización: 2026-09-14
+> Última actualización: 2026-09-16
 
 ---
 
@@ -56,6 +56,7 @@ Al terminar **cualquier** tarea marcada [OPENCODE], antes de darla por cerrada, 
 - **Todo secreto va por variables de entorno**, nunca hardcodeado, y `.env` debe estar en `.gitignore` desde la fase 0.
 - Antes de marcar una tarea de código como terminada, corre lo que exista de tests/lint del proyecto. Si no hay tests para esa parte, lo anota como pendiente en el .md (no bloquea la tarea, pero queda registrado).
 - Cada fase termina con un commit por tarea (no un commit gigante por fase), con mensaje descriptivo.
+- **Cada módulo funcional (notas, to-do, hábitos, entrenamiento) se implementa como una feature independiente y desacoplada** (carpeta/paquete propio en el código), compartiendo únicamente la infraestructura común: DB local (SQLite), motor de sync, autenticación. Ningún módulo debe importar lógica interna de otro. Esto es un requisito de diseño explícito, pensado para poder seguir agregando módulos nuevos sin reescribir los existentes.
 
 ---
 
@@ -150,22 +151,66 @@ Al terminar **cualquier** tarea marcada [OPENCODE], antes de darla por cerrada, 
 - [OPENCODE] Búsqueda global combinada (notas + tareas + hábitos).
 - [OPENCODE] Documentar + `mem_save`.
 
-## 13. Fase 12 — Diseño visual final
+## 13. Fase 12 — Módulo de Entrenamiento (registro de gimnasio)
+
+Módulo independiente y desacoplado del resto de la app (feature propia, sin dependencias internas de notas/to-do/hábitos), pensado **mobile-first** — sin adaptación de desktop ni widget en esta etapa.
+
+### 13.1 Modelo de datos
+
+- [OPENCODE] Diseñar el esquema:
+  - `bloque_entrenamiento` (id, nombre, fecha_inicio, `updated_at`, `deleted_at`, `device_id`)
+  - `semana` (id, bloque_id, numero)
+  - `dia` (id, semana_id, nombre, orden) — ej. "Día 1 · Espalda"
+  - `ejercicio` (id, nombre, es_predefinido bool, `updated_at`, `deleted_at`) — **biblioteca global**, no atada a un bloque: los ejercicios que crea el usuario quedan disponibles para reusar en cualquier bloque futuro
+  - `dia_ejercicio` (id, dia_id, ejercicio_id, orden, notas) — instancia de un ejercicio dentro de un día concreto; el campo `notas` es el apartado de texto libre debajo del ejercicio
+  - `serie` (id, dia_ejercicio_id, orden, peso, reps, peso_previo, reps_previo)
+  - Metadata de sync en todas las tablas igual que el resto del esquema (`updated_at`, `device_id`, `deleted_at`)
+- [OPENCODE] Cargar un set inicial de ejercicios predefinidos (`es_predefinido = true`) como seed de la biblioteca.
+- [OPENCODE] Generar las migraciones.
+- [PROGRAMADOR] Revisar y aprobar el esquema.
+- [OPENCODE] Documentar + `mem_save`.
+
+### 13.2 Backend API
+
+- [OPENCODE] Endpoints CRUD para bloque, semana, día, ejercicio (biblioteca), día-ejercicio y serie.
+- [OPENCODE] Endpoint `POST /semanas/{id}/duplicar` (o equivalente) que implementa la lógica de "crear semana N+1 a partir de N":
+  - Copia todos los días de la semana N (mismo nombre/orden).
+  - Para cada día, copia cada `dia_ejercicio` en el mismo orden.
+  - Para cada `dia_ejercicio`, copia **la cantidad de series que existan en N en el momento de la duplicación** (si se borró una serie en N antes de duplicar, no se copia a N+1).
+  - Cada serie copiada setea `peso_previo`/`reps_previo` = `peso`/`reps` de la serie original en N; `peso`/`reps` quedan en blanco (null) en N+1.
+  - El campo `notas` de cada `dia_ejercicio` **no** se copia automáticamente (arranca vacío en la semana nueva) — confirmar si se prefiere lo contrario más adelante.
+- [OPENCODE] Extender el endpoint de sync existente para incluir las tablas de este módulo (mismo mecanismo de pull por `updated_at`, sin lógica de sync nueva).
+- [OPENCODE] Tests unitarios, en particular de la lógica de duplicación de semana (casos: serie borrada, ejercicio nuevo agregado, serie nueva agregada).
+- [OPENCODE] Documentar + `mem_save`.
+
+### 13.3 App Android (mobile-first)
+
+- [OPENCODE] Setup de tablas espejo en SQLite local para este módulo.
+- [OPENCODE] Navegación: lista de bloques → semanas de un bloque → días de una semana → vista de un día.
+- [OPENCODE] Vista de un día: scroll vertical con, por cada ejercicio, su nombre, la tabla de series (fila = serie, columnas `previo` peso×reps / `peso` / `reps`, editable) y el campo de notas debajo. Agregar/eliminar series dentro de un ejercicio.
+- [OPENCODE] Selector de ejercicio al agregar uno a un día: buscar en la biblioteca global (predefinidos + propios) o crear uno nuevo al vuelo.
+- [OPENCODE] Pantalla de gestión de la biblioteca de ejercicios (ver/editar/borrar los propios; los predefinidos no se borran).
+- [OPENCODE] Botón "Crear semana N+1 a partir de esta" dentro de la vista de una semana, que llama al endpoint de duplicación (o replica la lógica localmente si se prioriza offline-first para este módulo — a definir con el programador).
+- [PROGRAMADOR] Probar en dispositivo real: carga de una semana completa, duplicación a la semana siguiente, edición de series, borrado de series y su efecto en la próxima duplicación.
+- [OPENCODE] Documentar + `mem_save`.
+
+## 14. Fase 13 — Diseño visual final
 
 - [PROGRAMADOR] Buscar referencias visuales y definir paleta/tipografía propias (decisión de diseño personal, no delegable al agente).
-- [OPENCODE] Implementar el sistema de diseño definido (tema, componentes reutilizables) sobre toda la app.
+- [OPENCODE] Implementar el sistema de diseño definido (tema, componentes reutilizables) sobre toda la app, incluyendo el módulo de entrenamiento.
 - [OPENCODE] Documentar + `mem_save`.
 
 ---
 
-## 14. Resumen de responsabilidades del programador (fuera de tareas de código)
+## 15. Resumen de responsabilidades del programador (fuera de tareas de código)
 
 Para tener a mano, todo lo que **no** es código y necesita tu intervención en algún punto:
 
 - Cuentas y credenciales de servicios externos (backend hosting, base de datos).
 - Instalación de SDKs/toolchains en tus máquinas.
 - Decisiones de esquema/negocio que el agente propone pero no aprueba solo.
-- Pruebas en dispositivos reales (Android físico, widget, notificaciones, doble click).
+- Pruebas en dispositivos reales (Android físico, widget, notificaciones, doble click, módulo de entrenamiento).
 - Despliegue y configuración de red/dominio del backend.
 - Empaquetado y distribución de la app de escritorio.
 - Decisiones de diseño visual y dónde se guardan los backups.
+- Confirmar si la duplicación de semana ("crear N+1 a partir de N") se resuelve online (llamando al backend) u offline-first en el propio dispositivo, dado que en el gimnasio no siempre hay buena conexión.
