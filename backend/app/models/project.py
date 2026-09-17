@@ -1,16 +1,15 @@
 from sqlmodel import SQLModel, Field, Column, ARRAY, String, create_engine, select
-import uuid
 from typing import Optional, List
-import datetime
+import uuid
 from datetime import datetime
 
 
-class Note(SQLModel, table=True):
+class Project(SQLModel, table=True):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()), primary_key=True)
-    title: str = Field(default="Untitled", max_length=200)
-    content: Optional[str] = None
-    is_pinned: Optional[bool] = False
-    tag_ids: Optional[List[str]] = Field(default=None, sa_column=Column(ARRAY(String)))
+    name: str = Field(default="", max_length=200)
+    color: str = Field(default="#10B981", max_length=7)
+    order: int = Field(default=0)
+    archived: bool = Field(default=False)
     deleted_at: Optional[datetime] = Field(default=None, sa_column_kwargs={"server_default": None})
     device_id: Optional[str] = Field(default=None)
     created_at: datetime = Field(default_factory=datetime.utcnow, sa_column_kwargs={"server_default": "now()"})
