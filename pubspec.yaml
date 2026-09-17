@@ -1,0 +1,25 @@
+name: notes_app
+description: A personal notes, habits & training app
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_bloc: ^8.0.0
+  equatable: ^2.0.0
+  supabase_flutter: ^1.5.0
+  intl: ^0.18.0
+  freezed_annotation: ^2.2.0
+  json_annotation: ^4.8.0
+  dartz: ^0.10.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^2.0.0
+  build_runner: ^2.4.0
+  freezed_annotat
