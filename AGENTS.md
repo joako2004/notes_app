@@ -6,7 +6,7 @@
 ## 0. Qué hacer al iniciar CADA sesión (antes de cualquier tarea)
 1. Leé este archivo completo.
 2. Leé `docs/STATUS.md` y `docs/DECISIONS.md`.
-3. Si Engram está disponible, leé los resúmenes del tema de la tarea y de las tareas previas relacionadas.
+3. Si Engram está disponible, leé SOLO las memorias con prefijo `notes_app-tauri/` (tarea actual y previas relacionadas).
 4. Corré (solo lectura): `git status --short --untracked-files=all`, `git branch --show-current`, `git log --oneline -3`.
 5. Analizá el código relevante para la tarea (los archivos que vas a tocar y sus vecinos directos) ANTES de editar.
 Si el mensaje dice "NO es una tarea", solo confirmá en máximo 8 líneas con tus palabras, mostrá la salida de los 3 comandos de git y detenete.
@@ -68,6 +68,8 @@ Verificá que el estado esté limpio, que la rama sea la correcta y que los últ
 - El repo es la fuente de verdad; Engram es memoria de apoyo.
 - Después de cada cambio guardá en Engram un resumen (qué cambió, archivos, resultados) con el nombre de tema que indique la tarea. Solo resúmenes de cambios: nunca reglas ni secretos.
 - Si Engram no está disponible, decilo en el informe y seguí.
+- Aislamiento: en Engram existen memorias de 2026-09-17 sobre `notes_app` que corresponden a otro stack (backend Python/PostgreSQL), no a este proyecto. Ignoralas por completo: no las uses, no las modifiques y no las borres.
+- Todo resumen nuevo se guarda con tema `notes_app-tauri/<id-de-tarea>` (por ejemplo `notes_app-tauri/0.1`).
 - `docs/STATUS.md` y `docs/DECISIONS.md` solo se editan si la tarea lo pide expresamente.
 
 ## 11. Secretos
