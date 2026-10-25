@@ -9,7 +9,7 @@ Cada fase se divide en tareas mínimas (un objetivo, archivos permitidos cerrado
 
 ## Fase 1 — Spikes (pruebas chicas de lo riesgoso; se descartan o se reutilizan)
 - 1.1a Scaffold de Tauri 2 + React + TypeScript en escritorio (build y chequeo de Rust). HECHA.
-- 1.1b Inicializar Android y correr la app en el celular físico. (build APK HECHO; prueba en celular pendiente)
+- 1.1b Inicializar Android y correr la app en el celular físico. HECHA.
 - 1.2 CodeMirror 6 en Android: autocorrector, mayúsculas automáticas, español/inglés.
 - 1.3 Widget Android nativo (Kotlin) con lista fija y un selector que la saca de pantalla.
 - 1.4 Alarma exacta con la app cerrada y el teléfono en reposo (permisos, batería, reinicio).
