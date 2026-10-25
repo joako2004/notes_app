@@ -3,12 +3,13 @@
 Cada fase se divide en tareas mínimas (un objetivo, archivos permitidos cerrados, criterios verificables por consola). El detalle de cada módulo se decide al empezarlo.
 
 ## Fase 0 — Base del proyecto
-- 0.1 Verificar entorno Ubuntu (git, Node, Rust, Android Studio/SDK/NDK, Java) y traer el repo `notes_app` al local.
-- 0.2 Instalar/configurar Engram y probar lectura/escritura de un resumen.
-- 0.3 Agregar al repo `AGENTS.md` y `docs/` (PLAN, DECISIONS, STATUS).
+- 0.1 Verificar entorno (solo lectura). HECHA.
+- 0.2 Preparar entorno Ubuntu/Android (manual). HECHA.
+- 0.3 Aislar Engram con prefijo notes_app-tauri/. HECHA.
 
 ## Fase 1 — Spikes (pruebas chicas de lo riesgoso; se descartan o se reutilizan)
-- 1.1 Tauri 2 "hola mundo" en Ubuntu y en el celular Android.
+- 1.1a Scaffold de Tauri 2 + React + TypeScript en escritorio (build y chequeo de Rust).
+- 1.1b Inicializar Android y correr la app en el celular físico.
 - 1.2 CodeMirror 6 en Android: autocorrector, mayúsculas automáticas, español/inglés.
 - 1.3 Widget Android nativo (Kotlin) con lista fija y un selector que la saca de pantalla.
 - 1.4 Alarma exacta con la app cerrada y el teléfono en reposo (permisos, batería, reinicio).
