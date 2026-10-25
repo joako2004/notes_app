@@ -33,3 +33,5 @@ Las decisiones de esta lista NO se discuten ni se cambian dentro de una tarea. C
 - Código e identificadores en inglés; textos de interfaz en español en un único archivo de strings.
 - Tests desde temprano para lógica pura (recurrencias, reinicio de tareas, sync).
 - Una rama por tarea, creada por la persona.
+## Herramientas
+- npm 10.8.2 falla con `npm install` plano en este proyecto; se usa `npm install --legacy-peer-deps` (el package-lock.json se generó así). Revisar si se actualiza npm.
