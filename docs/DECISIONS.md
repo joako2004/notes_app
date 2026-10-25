@@ -35,3 +35,4 @@ Las decisiones de esta lista NO se discuten ni se cambian dentro de una tarea. C
 - Una rama por tarea, creada por la persona.
 ## Herramientas
 - npm 10.8.2 falla con `npm install` plano en este proyecto; se usa `npm install --legacy-peer-deps` (el package-lock.json se generó así). Revisar si se actualiza npm.
+- Android: Java 21 y NDK 30.0.16248370 funcionan con Tauri 2.12.5 (AGP 9.3.1, Gradle 9.6.1, compileSdk 37). El plan B de JDK 17 / NDK anterior no hace falta. Gradle instala solo platform android-37.0 y build-tools 36.0.0.
