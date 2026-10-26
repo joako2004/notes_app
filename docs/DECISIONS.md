@@ -38,3 +38,4 @@ Las decisiones de esta lista NO se discuten ni se cambian dentro de una tarea. C
 - Android: Java 21 y NDK 30.0.16248370 funcionan con Tauri 2.12.5 (AGP 9.3.1, Gradle 9.6.1, compileSdk 37). El plan B de JDK 17 / NDK anterior no hace falta. Gradle instala solo platform android-37.0 y build-tools 36.0.0.
 - Prueba en el celular: `npm run tauri android dev` con el teléfono conectado por USB (depuración USB autorizada) y en la misma red que la compu, porque Tauri usa la IP de la red local para el servidor de desarrollo.
 - Editor: CodeMirror 6 confirmado en Android (Samsung SM-A528B, Android 14): mayúsculas, corrección y sugerencias OK en español e inglés. Requiere la opción de mayúsculas automáticas activada en el teclado.
+- Widget: RemoteViews clásicos confirmado en el Samsung SM-A528B (Android 14): lista desplazable, marcar y desaparecer sin abrir la app, estado en SharedPreferences que sobrevive a forzar detención y reinicio. Glance/Compose no hacen falta.

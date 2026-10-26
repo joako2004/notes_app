@@ -11,7 +11,7 @@ Cada fase se divide en tareas mínimas (un objetivo, archivos permitidos cerrado
 - 1.1a Scaffold de Tauri 2 + React + TypeScript en escritorio (build y chequeo de Rust). HECHA.
 - 1.1b Inicializar Android y correr la app en el celular físico. HECHA.
 - 1.2 CodeMirror 6 en Android: autocorrector, mayúsculas automáticas, español/inglés. HECHA.
-- 1.3 Widget Android nativo (Kotlin) con lista fija y un selector que la saca de pantalla.
+- 1.3 Widget Android nativo (Kotlin) con lista fija y un selector que la saca de pantalla. HECHA.
 - 1.4 Alarma exacta con la app cerrada y el teléfono en reposo (permisos, batería, reinicio).
 - 1.5 SQLite compartido entre la app y el widget.
 - 1.6 Supabase: tabla mínima, push/pull entre compu y celular.
@@ -43,7 +43,7 @@ Cada fase se divide en tareas mínimas (un objetivo, archivos permitidos cerrado
 - 5.3 Repeticiones configurables (diaria, semanal, mensual, otras).
 
 ## Fase 6 — Widget Android del to-do
-- 6.1 Widget definitivo (solo pendientes, marcar y desaparecer, reinicio).
+- 6.1 Widget definitivo (solo pendientes, marcar y desaparecer, reinicio). Pedidos: selector un poco más grande; tilde antes de desaparecer.
 
 ## Fase 7 — Calendario propio
 - 7.1 Vistas del calendario y CRUD de eventos.
