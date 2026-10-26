@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="widget_name">"Tareas (prueba)"</string>
+    <string name="widget_description">"Lista de tareas pendientes de prueba"</string>
+    <string name="widget_header">"Pendientes"</string>
+    <string name="widget_empty">"Todo al día"</string>
+    <string name="widget_reset_description">"Restablecer tareas pendientes"</string>
+    <string name="widget_mark_done">"Marcar %1$s como finalizada"</string>
+    <string name="widget_task_water">"Tomar agua"</string>
+    <string name="widget_task_read">"Leer 20 minutos"</string>
+    <string name="widget_task_stretch">"Estirar"</string>
+    <string name="widget_task_email">"Revisar correo"</string>
+    <string name="widget_task_walk">"Caminar 30 minutos"</string>
+    <string name="widget_task_meditate">"Meditar"</string>
+</resources>
