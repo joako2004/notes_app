@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="alarm_channel_name">"Alarma (prueba)"</string>
+    <string name="alarm_channel_description">"Canal de la alarma nativa de prueba"</string>
+    <string name="alarm_notification_title">"Alarma de prueba"</string>
+    <string name="alarm_notification_text">"La alarma nativa se disparó"</string>
+</resources>
