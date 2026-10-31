@@ -27,3 +27,9 @@ Lo actualiza la persona al cerrar cada tarea (el agente NO lo edita salvo pedido
 - Android: la plantilla usa source/target Java 8 y APIs obsoletas de AGP; el widget usa 2 APIs clásicas marcadas como obsoletas (solo warnings).
 - Engram CLI 1.10.1 tiene actualización disponible (3.6.0): decidir después.
 - Engram: #250 duplica a #265 y #134 no tiene proyecto: inofensivas, no se tocan.
+
+## Tarea 1.4 — spike de alarma exacta (cerrada con validaciones pendientes)
+- Probado en Samsung SM-A528B (Android 14), pruebas del 2026-10-30: base, app cerrada con pantalla apagada (`clock` y `exact`, 10 min) y cancelar. Atrasos de 34 a 838 ms.
+- Pendiente de validar: (a) noche real, una con `clock` y otra con `exact` (cubre Doze real, porque `deviceidle force-idle` no entró en Doze profundo en este teléfono); (b) reinicio: hay evidencia parcial con `exact` (línea "reprogramada tras reinicio"), falta repetirlo a propósito y probar `clock` y el caso "perdida durante el apagado".
+- Hallazgo: la notificación no tiene `contentIntent`, tocarla solo la descarta.
+- Próxima tarea: 1.5

@@ -39,3 +39,8 @@ Las decisiones de esta lista NO se discuten ni se cambian dentro de una tarea. C
 - Prueba en el celular: `npm run tauri android dev` con el teléfono conectado por USB (depuración USB autorizada) y en la misma red que la compu, porque Tauri usa la IP de la red local para el servidor de desarrollo.
 - Editor: CodeMirror 6 confirmado en Android (Samsung SM-A528B, Android 14): mayúsculas, corrección y sugerencias OK en español e inglés. Requiere la opción de mayúsculas automáticas activada en el teclado.
 - Widget: RemoteViews clásicos confirmado en el Samsung SM-A528B (Android 14): lista desplazable, marcar y desaparecer sin abrir la app, estado en SharedPreferences que sobrevive a forzar detención y reinicio. Glance/Compose no hacen falta.
+
+## 1.4 — alarma exacta (provisional)
+- Las alarmas se programan localmente en el teléfono con AlarmManager y suenan con la app cerrada y la pantalla apagada (pruebas de 10 min, `clock` y `exact`).
+- Decisión provisional: `setAlarmClock` ("clock") para alarmas visibles y `setExactAndAllowWhileIdle` ("exact") para recordatorios. Se confirma tras la prueba de la noche; el diseño definitivo es de la tarea 7.2.
+- Doze forzado no fue posible en este teléfono; se valida con la prueba de la noche.

@@ -56,3 +56,8 @@ Cada fase se divide en tareas mínimas (un objetivo, archivos permitidos cerrado
 ## Fase 9 — Estilo y pulido
 - 9.1 Diseño visual, claro/oscuro, accesibilidad.
 - 9.2 Empaquetado (.deb/AppImage y APK) y revisión final.
+## Pendientes de validación de la 1.4
+- Prueba de la noche (`clock` y `exact`) y repetición de la prueba de reinicio. No bloquean la 1.5.
+
+## Ideas futuras (sin fecha)
+- La app como "cerebro" o fuente de conocimiento para modelos de IA: que el proveedor de IA que use la persona pueda acceder a las notas. Forma de acceso por definir (a investigar cuando llegue el momento).
