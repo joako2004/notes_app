@@ -68,3 +68,6 @@ Cada fase se divide en tareas mínimas (un objetivo, archivos permitidos cerrado
 - 1.5c el widget escribe (marcar tarea) y la app lo ve.
 - 1.5d refresco app→widget y regla para alarmas/receivers (todo Kotlin que toque la base fuera del proceso de Rust).
 - 1.5b ✔ (2026-10-31) lectura desde :widget confirmada en Android 14.
+- 1.5c ✔ (2026-10-31) el widget escribe y la app lo detecta.
+- 1.5d el widget escribe conservando WAL (corrección del hallazgo de la 1.5c).
+- 1.5e refresco app→widget y regla para alarmas/receivers (reemplaza el alcance de la antigua 1.5d).

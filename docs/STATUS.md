@@ -46,3 +46,10 @@ Lo actualiza la persona al cerrar cada tarea (el agente NO lo edita salvo pedido
 - Widget antes de abrir la app: db_exists=false, no crea nada, muestra el estado vacío.
 - Sin probar todavía: API 24 (SQLite 3.9.2, el read-only sobre WAL requiere 3.22; hay fallback sin verificar), escrituras concurrentes/SQLITE_BUSY, refresco app→widget, integrity_check.
 - Hallazgos: "Todo al día" se usa también cuando falta la base; WidgetTasks.kt y WidgetTaskStore quedaron sin uso; toggle/reset de SharedPreferences desconectados de la lista hasta la 1.5c.
+
+## Tarea 1.5c — El widget escribe en la base compartida (cerrada 2026-10-31)
+- En el Samsung (Android 14): tocar una fila del widget marca la tarea como 'done' desde :widget (SharedDbWriter, goAsync + executor) en 4–27 ms, rows=1, retries=0, con la app abierta y cerrada. El widget refresca y la fila desaparece. Rust (hilo vigía cada 2 s) detecta el cambio con ~1 s de retraso. Dos toques seguidos (~125 ms): sin bloqueos. Reset del encabezado: rows=4. Transcript: docs/transcripts/2026-10-31_1843_1.5c.md.
+- HALLAZGO: con la app cerrada, la escritura del widget deja la base en journal_mode=delete (el widget abre RW sin ENABLE_WRITE_AHEAD_LOGGING). Con la app abierta se mantiene wal. Rust vuelve a fijar WAL al arrancar. Mecanismo probable, sin verificar: el framework de Android intenta pasar la base a su modo por defecto y solo lo logra sin otras conexiones abiertas. Se corrige en 1.5d.
+- Sin probar: API 24 (SQLite 3.9.2), contención real con Rust escribiendo a la vez, estrés.
+- Receptor del widget exported=true: cualquier app puede mandar ACTION_TOGGLE_TASK/ACTION_RESET_TASKS. Evaluar exported=false o permiso signature en la Fase 6.
+- Conocido: la lista sale ordenada por updated_at y título; WidgetTaskStore.kt y WidgetTasks.kt siguen sin uso; ACTION_RESET_TASKS es herramienta del spike.
