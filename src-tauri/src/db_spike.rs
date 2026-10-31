@@ -11,6 +11,12 @@ const DB_FILE: &str = "notes_spike.db";
 const DEVICE_ID: &str = "spike-device";
 const SPIKE_UPDATED_AT: i64 = 1_767_225_600;
 
+struct TaskCounts {
+    data_version: i64,
+    pending: i64,
+    done: i64,
+}
+
 const SPIKE_TASKS: [(&str, &str, &str); 4] = [
     (
         "11111111-1111-4111-8111-111111111111",
@@ -100,5 +106,66 @@ pub async fn init(app: &AppHandle) -> Result<SqlitePool, Box<dyn std::error::Err
     println!("SQLITESPIKE rust: journal_mode={journal_mode}");
     println!("SQLITESPIKE rust: rows={final_row_count}");
 
+    let watcher_pool = pool.clone();
+    match std::thread::Builder::new()
+        .name("sqlite-spike-watch".to_string())
+        .spawn(move || watch_task_counts(watcher_pool))
+    {
+        Ok(_) => println!("SQLITESPIKE rust: watcher=started"),
+        Err(error) => println!("SQLITESPIKE rust: watcher_spawn_error={error}"),
+    }
+
     Ok(pool)
+}
+
+fn watch_task_counts(pool: SqlitePool) {
+    let mut previous: Option<(i64, i64, i64)> = None;
+    loop {
+        match read_task_counts(&pool) {
+            Ok(counts) => {
+                let current = (counts.data_version, counts.pending, counts.done);
+                if previous != Some(current) {
+                    println!(
+                        "SQLITESPIKE rust: change data_version={} pending={} done={}",
+                        counts.data_version, counts.pending, counts.done
+                    );
+                    previous = Some(current);
+                }
+            }
+            Err(error) => {
+                println!("SQLITESPIKE rust: query_error={error}");
+            }
+        }
+        std::thread::sleep(Duration::from_secs(2));
+    }
+}
+
+fn read_task_counts(pool: &SqlitePool) -> Result<TaskCounts, sqlx::Error> {
+    let (data_version, status_counts) = tauri::async_runtime::block_on(async {
+        let data_version: i64 = sqlx::query_scalar("PRAGMA data_version")
+            .fetch_one(pool)
+            .await?;
+        let status_counts: Vec<(String, i64)> = sqlx::query_as::<_, (String, i64)>(
+            "SELECT status, COUNT(*) FROM tasks WHERE deleted_at IS NULL GROUP BY status",
+        )
+        .fetch_all(pool)
+        .await?;
+        Ok::<(i64, Vec<(String, i64)>), sqlx::Error>((data_version, status_counts))
+    })?;
+
+    let mut pending = 0;
+    let mut done = 0;
+    for (status, count) in status_counts {
+        match status.as_str() {
+            "pending" => pending = count,
+            "done" => done = count,
+            _ => {}
+        }
+    }
+
+    Ok(TaskCounts {
+        data_version,
+        pending,
+        done,
+    })
 }

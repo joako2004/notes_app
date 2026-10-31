@@ -8,9 +8,11 @@ import android.util.Log
 import java.io.File
 import java.io.IOException
 
+data class PendingTask(val id: String, val title: String)
+
 class SharedDbReader(private val context: Context) {
 
-    fun readPendingTaskTitles(): List<String> {
+    fun readPendingTasks(): List<PendingTask> {
         val dbFile = context.getDatabasePath(DB_NAME)
         logProcessInfo(dbFile)
 
@@ -24,7 +26,7 @@ class SharedDbReader(private val context: Context) {
         val readOnlyDatabase = openDatabase(dbFile, SQLiteDatabase.OPEN_READONLY, "READONLY")
         if (readOnlyDatabase != null) {
             try {
-                return readOnlyDatabase.use { database -> readTitles(database) }
+                return readOnlyDatabase.use { database -> readPendingTasks(database) }
             } catch (error: SQLiteException) {
                 Log.i(TAG, "open_mode=READONLY read failed: ${error.message}")
             }
@@ -44,7 +46,7 @@ class SharedDbReader(private val context: Context) {
                 } catch (queryOnlyError: SQLiteException) {
                     Log.i(TAG, "query_only failed: ${queryOnlyError.message}")
                 }
-                readTitles(database)
+                readPendingTasks(database)
             }
         } catch (error: SQLiteException) {
             Log.i(TAG, "open_mode=READWRITE read failed: ${error.message}")
@@ -63,9 +65,9 @@ class SharedDbReader(private val context: Context) {
             null
         }
 
-    private fun readTitles(database: SQLiteDatabase): List<String> {
+    private fun readPendingTasks(database: SQLiteDatabase): List<PendingTask> {
         logDatabaseInfo(database)
-        return queryPendingTitles(database)
+        return queryPendingTasks(database)
     }
 
     private fun logProcessInfo(dbFile: File) {
@@ -110,15 +112,18 @@ class SharedDbReader(private val context: Context) {
         }
     }
 
-    private fun queryPendingTitles(database: SQLiteDatabase): List<String> {
-        val titles = mutableListOf<String>()
+    private fun queryPendingTasks(database: SQLiteDatabase): List<PendingTask> {
+        val tasks = mutableListOf<PendingTask>()
         database.rawQuery(PENDING_TASKS_QUERY, null).use { cursor ->
             while (cursor.moveToNext()) {
-                titles += cursor.getString(0)
+                tasks += PendingTask(
+                    id = cursor.getString(0),
+                    title = cursor.getString(1),
+                )
             }
         }
-        Log.i(TAG, "pending_count=${titles.size}")
-        return titles
+        Log.i(TAG, "pending_count=${tasks.size}")
+        return tasks
     }
 
     companion object {
@@ -128,7 +133,7 @@ class SharedDbReader(private val context: Context) {
         private const val PROC_MAPS = "/proc/self/maps"
         private const val RUST_LIBRARY = "libnotes_app_lib"
         private const val PENDING_TASKS_QUERY =
-            "SELECT title FROM tasks WHERE status = 'pending' AND deleted_at IS NULL " +
+            "SELECT id, title FROM tasks WHERE status = 'pending' AND deleted_at IS NULL " +
                 "ORDER BY updated_at ASC, title ASC"
     }
 }

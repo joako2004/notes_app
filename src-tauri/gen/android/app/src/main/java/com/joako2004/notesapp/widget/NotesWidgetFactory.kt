@@ -1,6 +1,7 @@
 package com.joako2004.notesapp.widget
 
 import android.content.Context
+import android.content.Intent
 import android.widget.RemoteViews
 import android.widget.RemoteViewsService
 import com.joako2004.notesapp.R
@@ -9,27 +10,31 @@ class NotesWidgetFactory(
     private val context: Context,
 ) : RemoteViewsService.RemoteViewsFactory {
 
-    private var pendingTaskTitles: List<String> = emptyList()
+    private var pendingTasks: List<PendingTask> = emptyList()
 
     override fun onCreate() = Unit
 
     override fun onDataSetChanged() {
-        pendingTaskTitles = SharedDbReader(context).readPendingTaskTitles()
+        pendingTasks = SharedDbReader(context).readPendingTasks()
     }
 
     override fun onDestroy() {
-        pendingTaskTitles = emptyList()
+        pendingTasks = emptyList()
     }
 
-    override fun getCount(): Int = pendingTaskTitles.size
+    override fun getCount(): Int = pendingTasks.size
 
     override fun getViewAt(position: Int): RemoteViews? {
-        val taskTitle = pendingTaskTitles.getOrNull(position) ?: return null
+        val task = pendingTasks.getOrNull(position) ?: return null
         val views = RemoteViews(context.packageName, R.layout.widget_task_row)
-        views.setTextViewText(R.id.widget_task_text, taskTitle)
+        views.setTextViewText(R.id.widget_task_text, task.title)
         views.setContentDescription(
             R.id.widget_task_check,
-            context.getString(R.string.widget_mark_done, taskTitle),
+            context.getString(R.string.widget_mark_done, task.title),
+        )
+        views.setOnClickFillInIntent(
+            R.id.widget_task_check,
+            Intent().putExtra(NotesWidgetProvider.EXTRA_TASK_ID, task.id),
         )
         return views
     }

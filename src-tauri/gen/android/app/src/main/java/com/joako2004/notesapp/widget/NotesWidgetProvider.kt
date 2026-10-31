@@ -6,8 +6,12 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.os.Process
+import android.util.Log
 import android.widget.RemoteViews
 import com.joako2004.notesapp.R
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 class NotesWidgetProvider : AppWidgetProvider() {
 
@@ -24,19 +28,48 @@ class NotesWidgetProvider : AppWidgetProvider() {
     override fun onReceive(context: Context, intent: Intent) {
         when (intent.action) {
             ACTION_TOGGLE_TASK -> {
-                val taskId = intent.getIntExtra(EXTRA_TASK_ID, NO_TASK_ID)
-                if (taskId != NO_TASK_ID) {
-                    WidgetTaskStore(context).markCompleted(taskId)
-                    refreshWidgets(context)
+                val taskId = intent.getStringExtra(EXTRA_TASK_ID)
+                if (taskId == null || !isValidUuid(taskId)) {
+                    Log.i(TAG, "toggle ignored invalid_id=$taskId pid=${Process.myPid()}")
+                    return
                 }
+                handleWrite(context) { writer -> writer.markDone(taskId) }
             }
 
-            ACTION_RESET_TASKS -> {
-                WidgetTaskStore(context).reset()
-                refreshWidgets(context)
-            }
+            ACTION_RESET_TASKS -> handleWrite(context) { writer -> writer.resetPending() }
 
             else -> super.onReceive(context, intent)
+        }
+    }
+
+    private fun handleWrite(context: Context, write: (SharedDbWriter) -> WriteOutcome) {
+        val pendingResult = goAsync()
+        val appContext = context.applicationContext
+        try {
+            EXECUTOR.execute {
+                try {
+                    val outcome = write(SharedDbWriter(appContext))
+                    val errorMessage = outcome.error ?: "none"
+                    Log.i(
+                        TAG,
+                        "write_result rows=${outcome.rows} retries=${outcome.retries} " +
+                            "error=$errorMessage pid=${Process.myPid()}",
+                    )
+                } catch (error: Exception) {
+                    Log.e(TAG, "write failed", error)
+                } finally {
+                    try {
+                        refreshWidgets(appContext)
+                    } catch (error: RuntimeException) {
+                        Log.e(TAG, "refresh failed", error)
+                    } finally {
+                        pendingResult.finish()
+                    }
+                }
+            }
+        } catch (error: RuntimeException) {
+            Log.e(TAG, "write dispatch failed", error)
+            pendingResult.finish()
         }
     }
 
@@ -72,15 +105,23 @@ class NotesWidgetProvider : AppWidgetProvider() {
         val appWidgetManager = AppWidgetManager.getInstance(context)
         val componentName = ComponentName(context, NotesWidgetProvider::class.java)
         val appWidgetIds = appWidgetManager.getAppWidgetIds(componentName)
+        Log.i(TAG, "refresh widgets=${appWidgetIds.size} pid=${Process.myPid()}")
         appWidgetManager.notifyAppWidgetViewDataChanged(appWidgetIds, R.id.widget_task_list)
     }
+
+    private fun isValidUuid(value: String): Boolean = UUID_PATTERN.matches(value)
 
     companion object {
         const val ACTION_TOGGLE_TASK = "com.joako2004.notesapp.widget.ACTION_TOGGLE_TASK"
         const val ACTION_RESET_TASKS = "com.joako2004.notesapp.widget.ACTION_RESET_TASKS"
         const val EXTRA_TASK_ID = "com.joako2004.notesapp.widget.EXTRA_TASK_ID"
 
-        private const val NO_TASK_ID = -1
+        private const val TAG = "SQLITESPIKE"
+        private val UUID_PATTERN = Regex(
+            "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-" +
+                "[0-9a-fA-F]{4}-[0-9a-fA-F]{12}",
+        )
+        private val EXECUTOR: ExecutorService = Executors.newSingleThreadExecutor()
         private const val REQUEST_TOGGLE_TASK = 1
         private const val REQUEST_RESET_TASKS = 2
     }
