@@ -61,3 +61,9 @@ Cada fase se divide en tareas mínimas (un objetivo, archivos permitidos cerrado
 
 ## Ideas futuras (sin fecha)
 - La app como "cerebro" o fuente de conocimiento para modelos de IA: que el proveedor de IA que use la persona pueda acceder a las notas. Forma de acceso por definir (a investigar cuando llegue el momento).
+
+### Ajuste Fase 1 (2026-10-31)
+- 1.5 ✔ investigación SQLite compartido.
+- 1.5b Rust crea base con WAL en Android; widget en `:widget` la lee (solo lectura).
+- 1.5c el widget escribe (marcar tarea) y la app lo ve.
+- 1.5d refresco app→widget y regla para alarmas/receivers (todo Kotlin que toque la base fuera del proceso de Rust).

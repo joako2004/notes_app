@@ -44,3 +44,10 @@ Las decisiones de esta lista NO se discuten ni se cambian dentro de una tarea. C
 - Las alarmas se programan localmente en el teléfono con AlarmManager y suenan con la app cerrada y la pantalla apagada (pruebas de 10 min, `clock` y `exact`).
 - Decisión provisional: `setAlarmClock` ("clock") para alarmas visibles y `setExactAndAllowWhileIdle` ("exact") para recordatorios. Se confirma tras la prueba de la noche; el diseño definitivo es de la tarea 7.2.
 - Doze forzado no fue posible en este teléfono; se valida con la prueba de la noche.
+
+## Decisión 1.5 — Base SQLite compartida entre app y widget (2026-10-31)
+- Camino principal (A1): archivo SQLite único, Rust dueño del esquema y migraciones (sqlx directo, WAL, busy_timeout), widget Kotlin en proceso propio (`android:process=":widget"`).
+- Plan B: Kotlin dueño de la base en Android + plugin Tauri como puente.
+- Descartadas como arquitectura principal: C (snapshot + cola; escritura diferida) y D (ContentProvider; no resuelve el acceso de Rust).
+- Prohibido: widget en el proceso principal con SQLite propio abierto sobre el mismo archivo que Rust.
+- Provisoria hasta que 1.5b/1.5c/1.5d la confirmen o se pase al plan B.

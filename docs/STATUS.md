@@ -33,3 +33,10 @@ Lo actualiza la persona al cerrar cada tarea (el agente NO lo edita salvo pedido
 - Pendiente de validar: (a) noche real, una con `clock` y otra con `exact` (cubre Doze real, porque `deviceidle force-idle` no entró en Doze profundo en este teléfono); (b) reinicio: hay evidencia parcial con `exact` (línea "reprogramada tras reinicio"), falta repetirlo a propósito y probar `clock` y el caso "perdida durante el apagado".
 - Hallazgo: la notificación no tiene `contentIntent`, tocarla solo la descarta.
 - Próxima tarea: 1.5
+
+## Tarea 1.5 — Investigación SQLite compartido app/widget (cerrada 2026-10-31)
+- Solo investigación, sin código. Transcript: docs/transcripts/2026-10-31_1111_1.5.md.
+- Hallazgo clave: Rust (sqlx/libsqlite3-sys, enlazado estático) y Kotlin (SQLite del sistema) son dos copias de SQLite; en el mismo proceso, SQLite documenta riesgo de corrupción (howtocorrupt, sec. 2.3). WAL no lo resuelve.
+- Pendientes de verificar en 1.5b: (1) si sqlx fija WAL/busy_timeout por defecto (no verificado, fijarlos explícito igual); (2) que separar procesos (`:widget`) alcance en la práctica (inferencia, no dato de la fuente); (3) ruta real de la base en Android (dataDir); (4) lectura read-only de una base WAL desde Kotlin.
+- Hallazgo no cubierto por el informe: los receivers de alarmas (1.4, Fase 7.2) corren en el proceso principal y tendrían el mismo riesgo si leen la base. Se resuelve en 1.5d.
+- Pendientes de la 1.4 siguen abiertos (prueba de la noche y de reinicio).
