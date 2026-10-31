@@ -40,3 +40,9 @@ Lo actualiza la persona al cerrar cada tarea (el agente NO lo edita salvo pedido
 - Pendientes de verificar en 1.5b: (1) si sqlx fija WAL/busy_timeout por defecto (no verificado, fijarlos explícito igual); (2) que separar procesos (`:widget`) alcance en la práctica (inferencia, no dato de la fuente); (3) ruta real de la base en Android (dataDir); (4) lectura read-only de una base WAL desde Kotlin.
 - Hallazgo no cubierto por el informe: los receivers de alarmas (1.4, Fase 7.2) corren en el proceso principal y tendrían el mismo riesgo si leen la base. Se resuelve en 1.5d.
 - Pendientes de la 1.4 siguen abiertos (prueba de la noche y de reinicio).
+
+## Tarea 1.5b — Spike SQLite compartido Rust→widget (cerrada 2026-10-31)
+- Rust (sqlx 0.8.6, SQLite embebido 3.46.0) crea notes_spike.db en WAL; el widget, en proceso `:widget`, la lee con el SQLite del sistema (3.39.2, Samsung Android 14) en OPEN_READONLY: pending_count=3, journal_mode=wal, rust_lib_loaded=false, dos PIDs distintos, misma ruta (dataDir/databases/notes_spike.db). Transcript: docs/transcripts/2026-10-31_1145_1.5b.md.
+- Widget antes de abrir la app: db_exists=false, no crea nada, muestra el estado vacío.
+- Sin probar todavía: API 24 (SQLite 3.9.2, el read-only sobre WAL requiere 3.22; hay fallback sin verificar), escrituras concurrentes/SQLITE_BUSY, refresco app→widget, integrity_check.
+- Hallazgos: "Todo al día" se usa también cuando falta la base; WidgetTasks.kt y WidgetTaskStore quedaron sin uso; toggle/reset de SharedPreferences desconectados de la lista hasta la 1.5c.

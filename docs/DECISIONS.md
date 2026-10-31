@@ -51,3 +51,7 @@ Las decisiones de esta lista NO se discuten ni se cambian dentro de una tarea. C
 - Descartadas como arquitectura principal: C (snapshot + cola; escritura diferida) y D (ContentProvider; no resuelve el acceso de Rust).
 - Prohibido: widget en el proceso principal con SQLite propio abierto sobre el mismo archivo que Rust.
 - Provisoria hasta que 1.5b/1.5c/1.5d la confirmen o se pase al plan B.
+
+## Confirmación 1.5b — A1 sostenida en lectura (2026-10-31)
+- La lectura desde `:widget` sobre una base WAL creada por Rust funciona en Android 14 con dos copias de SQLite en procesos distintos. A1 sigue como camino principal; sigue provisoria hasta 1.5c (escritura), 1.5d (refresco, alarmas) y la prueba en API 24.
+- Corrección: sqlx 0.8.6 NO fija journal_mode por defecto (SQLite queda en DELETE en bases no WAL); busy_timeout 5 s, foreign_keys ON y synchronous FULL son los defaults. Fijamos WAL explícito. Fuente: docs.rs/sqlx/0.8.6 SqliteConnectOptions.

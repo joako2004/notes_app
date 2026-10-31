@@ -67,3 +67,4 @@ Cada fase se divide en tareas mínimas (un objetivo, archivos permitidos cerrado
 - 1.5b Rust crea base con WAL en Android; widget en `:widget` la lee (solo lectura).
 - 1.5c el widget escribe (marcar tarea) y la app lo ve.
 - 1.5d refresco app→widget y regla para alarmas/receivers (todo Kotlin que toque la base fuera del proceso de Rust).
+- 1.5b ✔ (2026-10-31) lectura desde :widget confirmada en Android 14.
