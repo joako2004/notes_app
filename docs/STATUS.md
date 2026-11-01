@@ -53,3 +53,9 @@ Lo actualiza la persona al cerrar cada tarea (el agente NO lo edita salvo pedido
 - Sin probar: API 24 (SQLite 3.9.2), contención real con Rust escribiendo a la vez, estrés.
 - Receptor del widget exported=true: cualquier app puede mandar ACTION_TOGGLE_TASK/ACTION_RESET_TASKS. Evaluar exported=false o permiso signature en la Fase 6.
 - Conocido: la lista sale ordenada por updated_at y título; WidgetTaskStore.kt y WidgetTasks.kt siguen sin uso; ACTION_RESET_TASKS es herramienta del spike.
+
+## Tarea 1.5d — El widget conserva WAL al escribir (cerrada 2026-11-01)
+- Causa confirmada (aviso del framework en el Samsung y código AOSP): al abrir en lectura/escritura sin ENABLE_WRITE_AHEAD_LOGGING, Android intenta pasar la base a su modo por defecto (TRUNCATE en este Samsung). Con otra conexión en WAL (app abierta) falla con SQLITE_BUSY y sigue en WAL; con la app cerrada lo logra y la base sale de WAL.
+- Corrección: `OPEN_READWRITE or ENABLE_WRITE_AHEAD_LOGGING` (API 16) en SharedDbWriter y en el respaldo RW de SharedDbReader; OPEN_READONLY intacto. Log nuevo `write journal_mode=<modo>`.
+- Probado en el Samsung (Android 14): app cerrada y app abierta (dos toques en 260 ms): siempre `wal`, bytes 18-19 del archivo = `2 2`, sin avisos del framework, rows=1 retries=0. Transcript: docs/transcripts/2026-10-31_1906_1.5d.md.
+- Sin probar: API 24 (SQLite 3.9.2: sin read-only WAL, entra el respaldo RW con WAL), otros dispositivos.

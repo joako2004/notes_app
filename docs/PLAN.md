@@ -71,3 +71,5 @@ Cada fase se divide en tareas mínimas (un objetivo, archivos permitidos cerrado
 - 1.5c ✔ (2026-10-31) el widget escribe y la app lo detecta.
 - 1.5d el widget escribe conservando WAL (corrección del hallazgo de la 1.5c).
 - 1.5e refresco app→widget y regla para alarmas/receivers (reemplaza el alcance de la antigua 1.5d).
+- 1.5d ✔ (2026-11-01) el widget conserva WAL al escribir.
+- 1.5e Rust (app) dispara el refresco del widget tras escribir en la base.

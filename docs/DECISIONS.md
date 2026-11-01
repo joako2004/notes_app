@@ -60,3 +60,7 @@ Las decisiones de esta lista NO se discuten ni se cambian dentro de una tarea. C
 - A1 sostenida también en escritura en Android 14: el widget (SQLite del sistema) escribe en el archivo creado por Rust (SQLite embebido) y la app lo detecta.
 - Regla nueva (provisoria hasta 1.5d): toda conexión Android de lectura/escritura debe abrir la base conservando WAL; si no, la base puede quedar en journal_mode=delete cuando la app está cerrada.
 - Riesgo anotado: receptor del widget exported=true acepta acciones propias de cualquier app.
+
+## Confirmación 1.5d — Regla de apertura desde Android (2026-11-01)
+- Toda apertura de lectura/escritura de la base desde Kotlin usa ENABLE_WRITE_AHEAD_LOGGING. No depender del journal mode por defecto del fabricante.
+- Regla derivada, a confirmar en la Fase 7.2: ningún código Kotlin que abra SQLite corre en el proceso principal (donde vive Rust); widget y receivers de alarmas que lean/escriban la base van en proceso propio.
