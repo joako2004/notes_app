@@ -102,10 +102,14 @@ class SharedDbWriter(private val context: Context) {
     }
 
     private fun executeOnce(dbFile: File, sql: String, bindArgs: Array<Any>): Int {
+        // ENABLE_WRITE_AHEAD_LOGGING keeps the shared database in WAL. Without it,
+        // the framework applies the platform default journal mode (manufacturer-defined)
+        // when this is the only open connection.
+        // https://developer.android.com/reference/android/database/sqlite/SQLiteDatabase#ENABLE_WRITE_AHEAD_LOGGING
         val database = SQLiteDatabase.openDatabase(
             dbFile.absolutePath,
             null,
-            SQLiteDatabase.OPEN_READWRITE,
+            SQLiteDatabase.OPEN_READWRITE or SQLiteDatabase.ENABLE_WRITE_AHEAD_LOGGING,
         )
         try {
             configureBusyTimeout(database)
@@ -118,7 +122,19 @@ class SharedDbWriter(private val context: Context) {
                 database.endTransaction()
             }
         } finally {
+            logJournalMode(database)
             database.close()
+        }
+    }
+
+    private fun logJournalMode(database: SQLiteDatabase) {
+        try {
+            database.rawQuery("PRAGMA journal_mode", null).use { cursor ->
+                val mode = if (cursor.moveToFirst()) cursor.getString(0) else "<no rows>"
+                Log.i(TAG, "write journal_mode=$mode pid=${Process.myPid()}")
+            }
+        } catch (error: SQLiteException) {
+            Log.e(TAG, "write journal_mode failed pid=${Process.myPid()}", error)
         }
     }
 

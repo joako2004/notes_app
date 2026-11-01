@@ -32,7 +32,14 @@ class SharedDbReader(private val context: Context) {
             }
         }
 
-        val readWriteDatabase = openDatabase(dbFile, SQLiteDatabase.OPEN_READWRITE, "READWRITE")
+        // Keep WAL in the fallback RW connection; the framework would otherwise
+        // apply the platform default journal mode when this is the only connection.
+        // https://developer.android.com/reference/android/database/sqlite/SQLiteDatabase#ENABLE_WRITE_AHEAD_LOGGING
+        val readWriteDatabase = openDatabase(
+            dbFile,
+            SQLiteDatabase.OPEN_READWRITE or SQLiteDatabase.ENABLE_WRITE_AHEAD_LOGGING,
+            "READWRITE",
+        )
         if (readWriteDatabase == null) {
             Log.i(TAG, "pending_count=0")
             return emptyList()
