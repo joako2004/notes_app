@@ -1,4 +1,5 @@
 mod db_spike;
+pub mod widget_refresh;
 
 use tauri::Manager;
 

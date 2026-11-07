@@ -38,6 +38,8 @@ class NotesWidgetProvider : AppWidgetProvider() {
 
             ACTION_RESET_TASKS -> handleWrite(context) { writer -> writer.resetPending() }
 
+            ACTION_REFRESH_LIST -> refreshWidgets(context)
+
             else -> super.onReceive(context, intent)
         }
     }
@@ -114,6 +116,7 @@ class NotesWidgetProvider : AppWidgetProvider() {
     companion object {
         const val ACTION_TOGGLE_TASK = "com.joako2004.notesapp.widget.ACTION_TOGGLE_TASK"
         const val ACTION_RESET_TASKS = "com.joako2004.notesapp.widget.ACTION_RESET_TASKS"
+        const val ACTION_REFRESH_LIST = "com.joako2004.notesapp.widget.ACTION_REFRESH_LIST"
         const val EXTRA_TASK_ID = "com.joako2004.notesapp.widget.EXTRA_TASK_ID"
 
         private const val TAG = "SQLITESPIKE"

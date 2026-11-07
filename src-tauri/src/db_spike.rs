@@ -115,6 +115,9 @@ pub async fn init(app: &AppHandle) -> Result<SqlitePool, Box<dyn std::error::Err
         Err(error) => println!("SQLITESPIKE rust: watcher_spawn_error={error}"),
     }
 
+    #[cfg(target_os = "android")]
+    spawn_demo_flip(pool.clone());
+
     Ok(pool)
 }
 
@@ -167,5 +170,99 @@ fn read_task_counts(pool: &SqlitePool) -> Result<TaskCounts, sqlx::Error> {
         data_version,
         pending,
         done,
+    })
+}
+
+// spike temporal, borrar en la Fase 2
+#[cfg(target_os = "android")]
+const DEMO_TASK_ID: &str = "44444444-4444-4444-8444-444444444444";
+
+#[cfg(target_os = "android")]
+fn spawn_demo_flip(pool: SqlitePool) {
+    match std::thread::Builder::new()
+        .name("sqlite-spike-demo".to_string())
+        .spawn(move || demo_flip_loop(pool))
+    {
+        Ok(_) => println!("SQLITESPIKE rust: demo=started"),
+        Err(error) => println!("SQLITESPIKE rust: demo_spawn_error={error}"),
+    }
+}
+
+#[cfg(target_os = "android")]
+fn demo_flip_loop(pool: SqlitePool) {
+    loop {
+        std::thread::sleep(Duration::from_secs(20));
+        let status = match flip_demo_task(&pool) {
+            Ok(status) => status,
+            Err(error) => {
+                println!("SQLITESPIKE rust: demo_error={error}");
+                continue;
+            }
+        };
+        let refresh = match crate::widget_refresh::request_widget_refresh() {
+            Ok(()) => "ok".to_string(),
+            Err(error) => format!("error: {error}"),
+        };
+        println!("SQLITESPIKE rust: demo_flip id={DEMO_TASK_ID} status={status} refresh={refresh}");
+    }
+}
+
+#[cfg(target_os = "android")]
+#[derive(Debug)]
+enum DemoFlipError {
+    Database(sqlx::Error),
+    Clock(std::time::SystemTimeError),
+    TaskNotFound,
+}
+
+#[cfg(target_os = "android")]
+impl std::fmt::Display for DemoFlipError {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Database(error) => write!(formatter, "database error: {error}"),
+            Self::Clock(error) => write!(formatter, "clock error: {error}"),
+            Self::TaskNotFound => write!(formatter, "demo task not found"),
+        }
+    }
+}
+
+#[cfg(target_os = "android")]
+impl std::error::Error for DemoFlipError {}
+
+#[cfg(target_os = "android")]
+impl From<sqlx::Error> for DemoFlipError {
+    fn from(error: sqlx::Error) -> Self {
+        Self::Database(error)
+    }
+}
+
+#[cfg(target_os = "android")]
+impl From<std::time::SystemTimeError> for DemoFlipError {
+    fn from(error: std::time::SystemTimeError) -> Self {
+        Self::Clock(error)
+    }
+}
+
+#[cfg(target_os = "android")]
+fn flip_demo_task(pool: &SqlitePool) -> Result<String, DemoFlipError> {
+    tauri::async_runtime::block_on(async {
+        let current: String = sqlx::query_scalar("SELECT status FROM tasks WHERE id = ?")
+            .bind(DEMO_TASK_ID)
+            .fetch_one(pool)
+            .await?;
+        let next = if current == "done" { "pending" } else { "done" };
+        let updated_at = std::time::SystemTime::now()
+            .duration_since(std::time::UNIX_EPOCH)?
+            .as_secs() as i64;
+        let outcome = sqlx::query("UPDATE tasks SET status = ?, updated_at = ? WHERE id = ?")
+            .bind(next)
+            .bind(updated_at)
+            .bind(DEMO_TASK_ID)
+            .execute(pool)
+            .await?;
+        if outcome.rows_affected() != 1 {
+            return Err(DemoFlipError::TaskNotFound);
+        }
+        Ok(next.to_string())
     })
 }
