@@ -64,3 +64,10 @@ Las decisiones de esta lista NO se discuten ni se cambian dentro de una tarea. C
 ## Confirmación 1.5d — Regla de apertura desde Android (2026-11-01)
 - Toda apertura de lectura/escritura de la base desde Kotlin usa ENABLE_WRITE_AHEAD_LOGGING. No depender del journal mode por defecto del fabricante.
 - Regla derivada, a confirmar en la Fase 7.2: ningún código Kotlin que abra SQLite corre en el proceso principal (donde vive Rust); widget y receivers de alarmas que lean/escriban la base van en proceso propio.
+
+## Cierre 1.5e: Rust → widget con broadcast explícito por JNI
+- Elegido: (b) `ndk-context` + `jni` 0.21.1 desde un hilo nativo propio: `Intent(action)` + `ComponentName(paquete, clase)` + `Context.sendBroadcast`. Solo clases del framework; los nombres de las clases de la app van como String (sin `FindClass` de clases propias).
+- Descartados: (a) `PlatformWebview::jni_handle` (salto asíncrono al hilo principal y canal para el Result); (c) plugin móvil de Tauri (crate, proyecto Android library y registro; fuera del alcance de un spike).
+- Kotlin: `ACTION_REFRESH_LIST` → `refreshWidgets(context)`, sin SQLite ni `goAsync`; manifiesto sin cambios.
+- `refresh=ok` significa "broadcast enviado". En el Motorola se vio que el widget relee tras cada envío y que no leyó entre la creación de la base y el primer broadcast.
+- Riesgo conocido: `ndk_context::android_context()` entra en pánico si la actividad fue destruida. Aceptado en el spike; el envío definitivo (Fase 2) debe resolverlo.

@@ -59,3 +59,13 @@ Lo actualiza la persona al cerrar cada tarea (el agente NO lo edita salvo pedido
 - Corrección: `OPEN_READWRITE or ENABLE_WRITE_AHEAD_LOGGING` (API 16) en SharedDbWriter y en el respaldo RW de SharedDbReader; OPEN_READONLY intacto. Log nuevo `write journal_mode=<modo>`.
 - Probado en el Samsung (Android 14): app cerrada y app abierta (dos toques en 260 ms): siempre `wal`, bytes 18-19 del archivo = `2 2`, sin avisos del framework, rows=1 retries=0. Transcript: docs/transcripts/2026-10-31_1906_1.5d.md.
 - Sin probar: API 24 (SQLite 3.9.2: sin read-only WAL, entra el respaldo RW con WAL), otros dispositivos.
+
+## Cierre 1.5e (2026-11-07): refresco Rust → widget
+- Rust (proceso principal) refresca la lista del widget (`:widget`) con un broadcast explícito `ACTION_REFRESH_LIST` enviado por JNI (ndk-context + jni 0.21.1), sin abrir SQLite en ese camino.
+- Dispositivo de pruebas nuevo: Motorola edge 50 fusion (serial ZY22JMKN67), Android 16 (API 36), parche 2026-09-01, arm64-v8a, WebView 156.0.8078.47. Instalación limpia.
+- SQLite: Rust 3.46.0 (embebido), sistema 3.44.5 (widget). Modo `wal`, bytes 18-19 = `2 2`.
+- 4 `demo_flip ... refresh=ok`; el widget relee entre ~90 y ~130 ms después, sin `write op=` del widget en ese camino. Sin `refresh=error`, sin crashes, sin avisos `journal mode`.
+- Contención: 12 escrituras del widget en ~5 s coincidiendo con un cambio de Rust, `retries=0`, sin `locked`/`SQLITE_BUSY`.
+- Sin probar en el Motorola: toque en el widget con la app cerrada (regla 1.5d en Android 16), 10 min en segundo plano, teclado del editor.
+- Doze se pudo forzar en el Motorola (`deviceidle force-idle` → IDLE): se puede completar la prueba pendiente de la 1.4 (resultados aparte).
+- Los resultados de 1.2–1.5d siguen siendo del Samsung SM-A528B (Android 14).

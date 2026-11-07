@@ -73,3 +73,7 @@ Cada fase se divide en tareas mínimas (un objetivo, archivos permitidos cerrado
 - 1.5e refresco app→widget y regla para alarmas/receivers (reemplaza el alcance de la antigua 1.5d).
 - 1.5d ✔ (2026-11-01) el widget conserva WAL al escribir.
 - 1.5e Rust (app) dispara el refresco del widget tras escribir en la base.
+
+- Cierre 1.5e ✔ (2026-11-07): Rust refresca el widget con broadcast explícito; probado en Motorola edge 50 fusion (Android 16).
+- Recordatorio Fase 2: borrar o evolucionar el hilo `sqlite-spike-demo`, el hilo vigía de 2 s, `WidgetTasks.kt`, `WidgetTaskStore.kt`, `ACTION_RESET_TASKS` y el paquete `alarm` del spike.
+- Pendiente (sin bloquear): ordenar las líneas agregadas al final de este archivo en la revisión de la Fase 1.
