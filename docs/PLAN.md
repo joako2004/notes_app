@@ -77,3 +77,8 @@ Cada fase se divide en tareas mínimas (un objetivo, archivos permitidos cerrado
 - Cierre 1.5e ✔ (2026-11-07): Rust refresca el widget con broadcast explícito; probado en Motorola edge 50 fusion (Android 16).
 - Recordatorio Fase 2: borrar o evolucionar el hilo `sqlite-spike-demo`, el hilo vigía de 2 s, `WidgetTasks.kt`, `WidgetTaskStore.kt`, `ACTION_RESET_TASKS` y el paquete `alarm` del spike.
 - Pendiente (sin bloquear): ordenar las líneas agregadas al final de este archivo en la revisión de la Fase 1.
+
+- Cierre 1.6a ✔ (parcial, 2026-11-08): investigación sin aprobar; el trabajo se reparte en 1.6b y 1.6c.
+- 1.6b: HTTPS desde Rust en escritorio y Android, sin Supabase (en curso).
+- 1.6c: Supabase, login, tabla mínima y push/pull entre compu y celular (después de la 1.6b).
+- Pendiente (sin bloquear): pruebas en el Motorola (ver STATUS) y ordenar las líneas agregadas al final de este archivo.

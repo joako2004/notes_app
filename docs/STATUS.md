@@ -69,3 +69,19 @@ Lo actualiza la persona al cerrar cada tarea (el agente NO lo edita salvo pedido
 - Sin probar en el Motorola: toque en el widget con la app cerrada (regla 1.5d en Android 16), 10 min en segundo plano, teclado del editor.
 - Doze se pudo forzar en el Motorola (`deviceidle force-idle` → IDLE): se puede completar la prueba pendiente de la 1.4 (resultados aparte).
 - Los resultados de 1.2–1.5d siguen siendo del Samsung SM-A528B (Android 14).
+
+## Cierre 1.6a (2026-11-08): investigación Supabase, PARCIAL (no aprobada)
+- Dos rondas con el agente; la entrega final seguía con errores (TLS, esquema, alcance). Se cierra sin código: el spike resuelve lo importante con pruebas reales.
+- Verificado: el AndroidManifest declara INTERNET. En el build Android, `reqwest` 0.13.5 llega por `tauri` v2.12.5 y `tauri-plugin-opener` 2.7.2 con solo la feature `json` y SIN backend TLS (ni rustls, ni ring, ni openssl, ni native-tls en Cargo.lock). En escritorio `reqwest` no está en el árbol. Hoy Rust no puede hacer HTTPS.
+- Pausa del plan gratuito (docs oficiales, supabase.com/docs/guides/platform/free-project-pausing): se pausa con poca actividad durante 7 días; unas pocas consultas diarias a la base alcanzan; aviso por correo ~1 semana antes; se puede restaurar hasta 1 año después ("Resume project").
+- Crates comunitarios (poca adopción, sin decidir): `rp-supabase-client` 0.3.0, `supabase-rust-postgrest` 0.4.0 (alfa, abril 2025), `supabase-rp` 0.7.0 (paraguas).
+- Sin decidir (se resuelve en 1.6c): cliente de sync, autenticación, cómo llegan URL y clave publishable, persistencia de sesión, esquema.
+- Lecciones de esquema para 1.6c: updated_at bigint (el integer de Postgres es de 32 bits); función de trigger en plpgsql (no sql) y para INSERT y UPDATE si se usa; la política de select NO debe ocultar filas borradas (los demás dispositivos deben poder recibir los borrados); políticas de select, insert y update; cursor de pull por (updated_at, id); decidir quién fija updated_at considerando relojes desfasados y el ida y vuelta.
+
+## Actualización 1.5e (2026-11-07): toque con app cerrada probado en el Motorola
+- Con la app sin proceso, el widget hizo `write op=mark_done` (retries=0, ms=20), journal_mode=wal, bytes 18-19 = `2 2`, sin avisos `journal mode`.
+
+## Pruebas pendientes en el Motorola (se retoman más adelante)
+- Validaciones de la 1.4: Doze (se puede forzar con `deviceidle force-idle`), reinicio, prueba de la noche (clock vs exact).
+- 10 minutos en segundo plano con el demo de la 1.5e activo.
+- Teclado del editor (mayúsculas y corrección) en el Motorola.

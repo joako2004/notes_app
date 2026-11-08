@@ -71,3 +71,9 @@ Las decisiones de esta lista NO se discuten ni se cambian dentro de una tarea. C
 - Kotlin: `ACTION_REFRESH_LIST` → `refreshWidgets(context)`, sin SQLite ni `goAsync`; manifiesto sin cambios.
 - `refresh=ok` significa "broadcast enviado". En el Motorola se vio que el widget relee tras cada envío y que no leyó entre la creación de la base y el primer broadcast.
 - Riesgo conocido: `ndk_context::android_context()` entra en pánico si la actividad fue destruida. Aceptado en el spike; el envío definitivo (Fase 2) debe resolverlo.
+
+## Cierre 1.6a: qué queda decidido y qué no
+- El backend sigue siendo Supabase (sin cambios). El cliente de sync, la autenticación, el manejo de URL y clave y el almacenamiento de la sesión quedan SIN decidir hasta el spike 1.6c.
+- Hecho verificado que lo condiciona todo: el build actual no tiene TLS. Antes de hablar con Supabase hay que lograr HTTPS desde Rust en escritorio y Android (spike 1.6b, sin Supabase).
+- Regla de diseño: la lista que ve la persona sale siempre del SQLite local; la red solo se usa para sincronizar.
+- Esquema a respetar en 1.6c y la Fase 3: updated_at bigint; las filas borradas deben poder bajar a los otros dispositivos; políticas de select, insert y update; cursor de pull por (updated_at, id).
