@@ -85,3 +85,11 @@ Lo actualiza la persona al cerrar cada tarea (el agente NO lo edita salvo pedido
 - Validaciones de la 1.4: Doze (se puede forzar con `deviceidle force-idle`), reinicio, prueba de la noche (clock vs exact).
 - 10 minutos en segundo plano con el demo de la 1.5e activo.
 - Teclado del editor (mayúsculas y corrección) en el Motorola.
+
+## Cierre 1.6b — HTTPS desde Rust (2026-11-09)
+- Rust ya hace HTTPS con verificación de certificados, sin OpenSSL, en escritorio (linux-x86_64) y en Android aarch64 (Motorola edge 50 fusion, Android 16).
+- Configuración: reqwest 0.13.5 (default-features = false, feature rustls) + rustls 0.23 + webpki-roots 1.0.11, con use_preconfigured_tls. Proveedor criptográfico: aws-lc-rs 1.19.0 (compila con el NDK 30 sin problemas).
+- Con la feature rustls sola, reqwest usa rustls-platform-verifier y en Android entra en pánico ("Expect rustls-platform-verifier to be initialized"). Ese crate sigue compilado pero no se invoca.
+- Resultado en ambos: example.com → 200 OK (577 bytes); expired.badssl.com → error "certificate expired".
+- APK debug aarch64: 335.321.748 bytes (+43.608.768 vs la 1.5e).
+- Spike temporal: src-tauri/src/https_spike.rs, borrar en la Fase 3.

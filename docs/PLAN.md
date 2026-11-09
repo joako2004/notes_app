@@ -82,3 +82,4 @@ Cada fase se divide en tareas mínimas (un objetivo, archivos permitidos cerrado
 - 1.6b: HTTPS desde Rust en escritorio y Android, sin Supabase (en curso).
 - 1.6c: Supabase, login, tabla mínima y push/pull entre compu y celular (después de la 1.6b).
 - Pendiente (sin bloquear): pruebas en el Motorola (ver STATUS) y ordenar las líneas agregadas al final de este archivo.
+- Cierre 1.6b ✔ HTTPS desde Rust (rustls + raíces embebidas). Recordatorio: borrar src-tauri/src/https_spike.rs en la Fase 3.

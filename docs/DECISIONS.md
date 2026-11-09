@@ -77,3 +77,10 @@ Las decisiones de esta lista NO se discuten ni se cambian dentro de una tarea. C
 - Hecho verificado que lo condiciona todo: el build actual no tiene TLS. Antes de hablar con Supabase hay que lograr HTTPS desde Rust en escritorio y Android (spike 1.6b, sin Supabase).
 - Regla de diseño: la lista que ve la persona sale siempre del SQLite local; la red solo se usa para sincronizar.
 - Esquema a respetar en 1.6c y la Fase 3: updated_at bigint; las filas borradas deben poder bajar a los otros dispositivos; políticas de select, insert y update; cursor de pull por (updated_at, id).
+
+## Cierre 1.6b — Camino HTTPS desde Rust (2026-11-09)
+- Elegido: reqwest directo con rustls y raíces de certificados embebidas (webpki-roots). Sin JNI, sin Kotlin, sin Gradle.
+- No evaluada: tauri-plugin-http (el agente la descartó por requerir registrar el plugin; no se probó).
+- Descartado: verificador de plataforma por defecto (rustls-platform-verifier). En Android exige inicializarlo por JNI.
+- Contras aceptados: no respeta CAs instaladas por la persona en el teléfono; las raíces solo se actualizan con una versión nueva de la app.
+- Plan B si hiciera falta: inicializar rustls-platform-verifier (JNI + Gradle), como tarea aparte.
