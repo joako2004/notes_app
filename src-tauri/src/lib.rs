@@ -1,5 +1,6 @@
 mod db_spike;
 pub mod widget_refresh;
+mod https_spike;
 
 use tauri::Manager;
 
@@ -16,6 +17,8 @@ pub fn run() {
         .setup(|app| {
             let pool = tauri::async_runtime::block_on(db_spike::init(app.handle()))?;
             app.manage(pool);
+            // Lanzar spike HTTPS una sola vez al iniciar
+            tauri::async_runtime::spawn(https_spike::run());
             Ok(())
         })
         .invoke_handler(tauri::generate_handler![greet])
